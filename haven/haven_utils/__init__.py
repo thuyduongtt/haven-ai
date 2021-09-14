@@ -72,7 +72,7 @@ def mask_on_image(mask, image):
     mask = mask.squeeze().astype(int)
     image = hi.image_as_uint8(image) / 255.0
     labels = [l for l in np.unique(mask) if l < len(color_dict)]
-    colors = default_colors + list(color_dict.keys())[len(default_colors) :]
+    colors = default_colors + list(color_dict.keys())[len(default_colors):]
     colors = np.array(colors)[labels]
 
     image_label_overlay = label2rgb(
@@ -86,18 +86,18 @@ def get_image(img, denorm=None, size=None, points=None, radius=10, mask=None, he
 
 
 def save_image(
-    fname,
-    img,
-    denorm=None,
-    size=None,
-    points=None,
-    radius=10,
-    mask=None,
-    heatmap=None,
-    makedirs=True,
-    return_image=False,
-    nrow=8,
-    bbox_yxyx=None,
+        fname,
+        img,
+        denorm=None,
+        size=None,
+        points=None,
+        radius=10,
+        mask=None,
+        heatmap=None,
+        makedirs=True,
+        return_image=False,
+        nrow=8,
+        bbox_yxyx=None,
 ):
     """Save an image into a file.
 
@@ -363,15 +363,15 @@ def copy_code(src_path, dst_path, verbose=1):
     # Define the command for copying the code using rsync
     if os.path.exists(os.path.join(src_path, ".havenignore")):
         rsync_code = (
-            "rsync -av -r -q  --delete-before --exclude='.*'  --exclude-from=%s \
-                        --exclude '__pycache__/' %s %s"
-            % (os.path.join(src_path, ".havenignore"), src_path, dst_path)
+                "rsync -av -r -q  --delete-before --exclude='.*'  --exclude-from=%s \
+                            --exclude '__pycache__/' %s %s"
+                % (os.path.join(src_path, ".havenignore"), src_path, dst_path)
         )
     else:
         rsync_code = (
-            "rsync -av -r -q  --delete-before --exclude='.*' \
-                        --exclude '__pycache__/' %s %s"
-            % (src_path, dst_path)
+                "rsync -av -r -q  --delete-before --exclude='.*' \
+                            --exclude '__pycache__/' %s %s"
+                % (src_path, dst_path)
         )
 
     # Run the command in the terminal
@@ -618,10 +618,23 @@ def _denorm(image, mu, var, bgr2rgb=False):
     [type]
         Denormalized image
     """
-    print(var)
-    print(mu)
+
     if image.ndim == 3:
-        result = image * var[:, None, None] + mu[:, None, None]  # TODO: Is it variance or std?
+        # using with more-than-3-channel images
+        in_channels = image.shape[0]
+        out_channels = var.shape[0]
+
+        repeat = in_channels // out_channels
+        if in_channels % out_channels > 0:
+            repeat += 1
+
+        var2 = np.tile(var, repeat)[:in_channels]
+        mu2 = np.tile(mu, repeat)[:in_channels]
+
+        print(var2)
+        print(mu2)
+
+        result = image * var2[:, None, None] + mu2[:, None, None]  # TODO: Is it variance or std?
         if bgr2rgb:
             result = result[::-1]
     else:
@@ -1015,7 +1028,6 @@ def collate_fn(batch, mode="list"):
         for k in batch[0]:
             batch_dict[k] = []
             for i in range(len(batch)):
-
                 batch_dict[k] += [batch[i][k]]
 
         return batch_dict
