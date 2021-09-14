@@ -618,8 +618,8 @@ def _denorm(image, mu, var, bgr2rgb=False):
     [type]
         Denormalized image
     """
-
-    print(f'image.ndim = {image.ndim}')
+    print(var)
+    print(mu)
     if image.ndim == 3:
         result = image * var[:, None, None] + mu[:, None, None]  # TODO: Is it variance or std?
         if bgr2rgb:
