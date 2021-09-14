@@ -621,20 +621,21 @@ def _denorm(image, mu, var, bgr2rgb=False):
 
     if image.ndim == 3:
         # using with more-than-3-channel images
-        in_channels = image.shape[0]
+        # in_channels = image.shape[0]
         out_channels = var.shape[0]
 
-        repeat = in_channels // out_channels
-        if in_channels % out_channels > 0:
-            repeat += 1
+        # if in_channels > out_channels:
+        #     repeat = in_channels // out_channels
+        #     if in_channels % out_channels > 0:
+        #         repeat += 1
+        #
+        #     var2 = np.tile(var, repeat)[:in_channels]
+        #     mu2 = np.tile(mu, repeat)[:in_channels]
+        # else:
+        #     var2 = var
+        #     mu2 = mu
 
-        var2 = np.tile(var, repeat)[:in_channels]
-        mu2 = np.tile(mu, repeat)[:in_channels]
-
-        print(var2)
-        print(mu2)
-
-        result = image * var2[:, None, None] + mu2[:, None, None]  # TODO: Is it variance or std?
+        result = image[:out_channels] * var[:, None, None] + mu[:, None, None]  # TODO: Is it variance or std?
         if bgr2rgb:
             result = result[::-1]
     else:
